@@ -1,5 +1,6 @@
 // src/app.ts
-import express, { Request, Response } from 'express';
+import express from 'express';
+import type { Request, Response, NextFunction } from 'express'; // Separate type imports
 import crypto from 'crypto';
 import dotenv from 'dotenv';
 
@@ -17,7 +18,7 @@ app.use(express.json({
 }));
 
 // Verification Middleware
-const verifyGitHubSignature = (req: Request, res: Response, next: Function) => {
+const verifyGitHubSignature = (req: Request, res: Response, next: NextFunction) => {
   const signature = req.headers['x-hub-signature-256'] as string;
   
   if (!signature) {
@@ -43,13 +44,11 @@ app.post('/webhooks/github', verifyGitHubSignature, (req: Request, res: Response
   // Rule 3.1: Immediate Handshake (Under 200ms)
   res.status(200).json({ received: true });
 
-  // Handle only specific pull request actions
   if (event === 'pull_request') {
-    const { action, number, pull_request } = payload;
+    const { action, number } = payload;
     
     if (action === 'opened' || action === 'synchronize') {
-      console.log(`🚀 PR #${number} updated or opened. Offloading to memory queue...`);
-      // TODO: Phase 2 will push 'payload' data straight to BullMQ right here!
+      console.log(`🚀 PR #${number} updated or opened. Ready to hand off to memory queue...`);
     }
   }
 });
