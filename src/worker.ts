@@ -58,4 +58,3 @@ worker.on('failed', (job, err) => {
 });
 
 console.log('跑 Background Worker Engine running and waiting for jobs...');
-
