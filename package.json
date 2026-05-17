@@ -1,12 +1,13 @@
 {
   "dependencies": {
+    "crypto": "^1.0.1",
+    "dotenv": "^17.4.2",
     "express": "^5.2.1"
   },
   "name": "pr-bot",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -21,5 +22,12 @@
   "bugs": {
     "url": "https://github.com/tanmaygalav/PR-Bot-Ai/issues"
   },
-  "homepage": "https://github.com/tanmaygalav/PR-Bot-Ai#readme"
+  "homepage": "https://github.com/tanmaygalav/PR-Bot-Ai#readme",
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.8.0",
+    "nodemon": "^3.1.14",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.3"
+  }
 }
