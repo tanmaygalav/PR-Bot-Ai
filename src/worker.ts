@@ -3,6 +3,7 @@ import { Worker } from 'bullmq';
 import type { Job } from 'bullmq';
 import { redisConnection } from './queue';
 import { parseAndFilterDiff } from './diffParser';
+import { analyzeCodeDiff } from './aiEngine'; // Import AI engine
 
 const MAX_REVIEWABLE_FILES = 100;
 
@@ -14,37 +15,32 @@ const worker = new Worker(
     console.log(`\n⚙️  [Worker] Processing PR #${prNumber} for ${repoOwner}/${repoName}`);
 
     try {
-      // 1. Fetch the raw cryptographic diff file streaming straight from GitHub
-      console.log(`📥 [Worker] Fetching raw diff contents from: ${diffUrl}`);
+      // 1. Fetch raw diff from GitHub endpoint
       const response = await fetch(diffUrl);
-      
-      if (!response.ok) {
-        throw new Error(`Failed to fetch diff file from GitHub. Status: ${response.status}`);
-      }
-      
+      if (!response.ok) throw new Error(`Failed to fetch diff. Status: ${response.status}`);
       const rawDiffText = await response.text();
 
-      // 2. Parse and scrub the diff down to actionable code context tokens
+      // 2. Parse down to token-optimized code changes
       const targetedFiles = parseAndFilterDiff(rawDiffText);
-      console.log(`📊 [Worker] Filtered down to ${targetedFiles.length} structural files for review.`);
+      console.log(`📊 [Worker] Target structural files identified: ${targetedFiles.length}`);
 
-      // 3. Edge Case Mitigation Matrix check (Section 6)
       if (targetedFiles.length > MAX_REVIEWABLE_FILES) {
-        console.warn(`🛑 [Worker] PR contains ${targetedFiles.length} files, exceeding safe processing ceiling.`);
-        // TODO: Trigger early exit mitigation flow and post a singular summary message to GitHub
+        console.warn(`🛑 [Worker] PR files exceed max limit.`);
         return;
       }
 
-      // Print a structural trace of what we're about to forward into the AI Core
-      for (const file of targetedFiles) {
-        console.log(`   🔸 Ready to analyze: ${file.fileName} (${file.diffContent.split('\n').length} lines of changes)`);
-      }
+      // 3. Dispatch directly to Gemini Core
+      const reviewResultMarkdown = await analyzeCodeDiff(targetedFiles);
+      
+      console.log(`\n🤖 [Worker] --- CRITIQUE OUTPUT FOR PR #${prNumber} ---`);
+      console.log(reviewResultMarkdown);
+      console.log(`---------------------------------------------------\n`);
 
-      // TODO: Phase 4 will dispatch 'targetedFiles' cleanly into the Generative AI Client matrix right here!
+      // TODO: Phase 5 will use the GitHub REST API to post this markdown output directly to the PR!
 
     } catch (error: any) {
-      console.error(`❌ [Worker] Error compiling context block data: ${error.message}`);
-      throw error; // Propagates failure to trigger BullMQ exponential retry protocols
+      console.error(`❌ [Worker] Processing error encountered: ${error.message}`);
+      throw error;
     }
   },
   {
@@ -53,8 +49,4 @@ const worker = new Worker(
   }
 );
 
-worker.on('failed', (job, err) => {
-  console.error(`🚨 [Worker] Job ${job?.id} hard-failed: ${err.message}`);
-});
-
-console.log('跑 Background Worker Engine running and waiting for jobs...');
+console.log('🏃‍♂️ Background Worker Engine running and waiting for jobs...');
