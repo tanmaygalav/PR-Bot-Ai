@@ -1,4 +1,5 @@
 // src/queue.ts
+import { Queue } from 'bullmq';
 import IORedis from 'ioredis';
 import dotenv from 'dotenv';
 

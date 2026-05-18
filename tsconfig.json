@@ -1,12 +1,15 @@
 {
   "compilerOptions": {
-    "target": "ES2022",                          /* Specify ECMAScript target version */
-    "module": "commonjs",                        /* Use CommonJS for seamless ts-node execution */
-    "moduleResolution": "node",                  /* Resolve modules using standard Node logic */
-    "esModuleInterop": true,                     /* Allows standard imports for CommonJS modules */
-    "forceConsistentCasingInFileNames": true,    /* Ensure cross-platform file naming safety */
-    "strict": true,                              /* Enable all strict type-checking options */
-    "skipLibCheck": true                         /* Skip type checking of declaration files to save speed */
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "node10", 
+    "ignoreDeprecations": "6.0", // ✨ Add this exact line to silence the error
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
   },
   "include": ["src/**/*"]
 }
