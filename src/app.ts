@@ -55,6 +55,12 @@ app.post('/webhooks/github', verifyGitHubSignature, async (req: Request, res: Re
   }
 });
 
+// Dedicated keep-alive route for external pingers
+app.get('/health', (req, res) => {
+  res.status(200).send('🚀 PR-Bot is wide awake and active.');
+});
+
+
 app.listen(PORT, () => {
   console.log(`🤖 PR-Bot AI server listening securely on port ${PORT}`);
 });
