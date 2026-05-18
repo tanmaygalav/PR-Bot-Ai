@@ -5,10 +5,19 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+let url = process.env.REDIS_URL;
+
+// 🔒 Auto-Correct Protocol Scheme:
+// If the URL uses unencrypted 'redis://' but points to an external cloud instance,
+// automatically upgrade it to 'rediss://' to enforce the required TLS security layer.
+if (url && url.startsWith('redis://') && !url.includes('127.0.0.1') && !url.includes('localhost')) {
+  url = url.replace('redis://', 'rediss://');
+}
+
 // Automatically connect using the Cloud Redis connection URL if available
 // Otherwise, fall back to your local machine defaults
-export const redisConnection = process.env.REDIS_URL
-  ? new IORedis(process.env.REDIS_URL, {
+export const redisConnection = url
+  ? new IORedis(url, {
       maxRetriesPerRequest: null, // Required setting for BullMQ compatibility
     })
   : new IORedis({
