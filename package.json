@@ -12,9 +12,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start:server": "npx nodemon src/app.ts",
-    "start:worker": "npx nodemon src/worker.ts"
+  "start:server": "npx nodemon src/app.ts",
+  "start:worker": "npx nodemon src/worker.ts",
+  "build": "tsc",
+  "start:prod": "ts-node src/app.ts & ts-node src/worker.ts"
   },
   "repository": {
     "type": "git",
