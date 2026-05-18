@@ -1,13 +1,20 @@
 // src/queue.ts
-import { Queue } from 'bullmq';
 import IORedis from 'ioredis';
+import dotenv from 'dotenv';
 
-// Connect directly to the Docker Redis container on port 6379
-export const redisConnection = new IORedis({
-  host: '127.0.0.1',
-  port: 6379,
-  maxRetriesPerRequest: null // Required setting for BullMQ compatibility
-});
+dotenv.config();
+
+// Automatically connect using the Cloud Redis connection URL if available
+// Otherwise, fall back to your local machine defaults
+export const redisConnection = process.env.REDIS_URL
+  ? new IORedis(process.env.REDIS_URL, {
+      maxRetriesPerRequest: null, // Required setting for BullMQ compatibility
+    })
+  : new IORedis({
+      host: '127.0.0.1',
+      port: 6379,
+      maxRetriesPerRequest: null, // Required setting for BullMQ compatibility
+    });
 
 // Create our named queue channel
 export const prReviewQueue = new Queue('pr-review-queue', {
