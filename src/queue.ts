@@ -7,9 +7,7 @@ dotenv.config();
 
 let url = process.env.REDIS_URL;
 
-// 🔒 Auto-Correct Protocol Scheme:
-// If the URL uses unencrypted 'redis://' but points to an external cloud instance,
-// automatically upgrade it to 'rediss://' to enforce the required TLS security layer.
+// Auto-Correct Protocol Scheme:
 if (url && url.startsWith('redis://') && !url.includes('127.0.0.1') && !url.includes('localhost')) {
   url = url.replace('redis://', 'rediss://');
 }
